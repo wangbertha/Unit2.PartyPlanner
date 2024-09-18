@@ -13,7 +13,7 @@ async function getEvents() {
     // Wait for the response to be transformed into JSON
     const responseObj = await response.json();
 
-    debugger;
+    // debugger;
     // always debug here to inspect the shape of the response object
     // received from the API, because every API returns a different thing
     events = responseObj.data;
@@ -48,28 +48,6 @@ async function addEvent(event) {
   }
 }
 
-/** Requests the API to update the event */
-async function updateEvent(event) {
-  try {
-    const response = await fetch(API_URL + event.id, {
-      method: "PUT",
-      // This is just boilerplate to indicate that
-      // I am sending JSON over in my request
-      headers: { "Content-Type": "application/json" },
-
-      // The body = data I'm sending turned into a JSON string
-      body: JSON.stringify(event),
-    });
-
-    if (!response.ok) {
-      const responseObj = await response.json();
-      throw new Error(responseObj.error.message);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 /** Requests the API to delete the event with the given `id` */
 async function deleteEvent(id) {
   try {
@@ -89,11 +67,12 @@ async function deleteEvent(id) {
 
 /** Renders events in state */
 function renderEvents() {
-  const $recipes = events.map((event) => {
+  const $events = events.map((event) => {
     const $li = document.createElement("li");
     $li.innerHTML = `
       <h2>${event.name}</h2>
-      <img src="${event.imageUrl}"/>
+      <p>${event.date}</p>
+      <p>${event.location}</p>
       <p>${event.description}</p>
       <button>Delete</button>
     `;
@@ -111,7 +90,7 @@ function renderEvents() {
   });
 
   const $ul = document.querySelector("ul");
-  $ul.replaceChildren(...$recipes);
+  $ul.replaceChildren(...$events);
 }
 
 // #region Script
@@ -124,19 +103,20 @@ init();
 
 // Add event with form data when form is submitted
 const $form = document.querySelector("form");
-$form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+$form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
   // We can use `form.inputName` to reference input elements within the form
-  const event = {
+  const date = new Date($form.date.value).toISOString();
+  const newEvent = {
     name: $form.title.value,
-    description: $form.instructions.value,
-    date: $form.date.value,
+    description: $form.description.value,
+    date: date,
     location: $form.location.value,
   };
 
   // Wait for the API to add the event, then fetch the updated data & rerender
-  await addEvent(event);
+  await addEvent(newEvent);
   await getEvents();
   renderEvents();
 });
