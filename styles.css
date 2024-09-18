@@ -1,3 +1,13 @@
+form {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 1rem;
+}
+
+form button {
+    grid-column: 1 / -1;
+}
+
 ul {
     list-style: none;
     padding-left: 0;
@@ -13,8 +23,4 @@ li {
     padding: 1rem;
 
     overflow-y: auto;
-}
-
-img {
-    max-width: 100%;
 }
